@@ -9,9 +9,9 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans JP', sans-serif;
-  background: linear-gradient(135deg, #f5e6d3 0%, #e8d4c4 100%);
+  background: linear-gradient(160deg, #f5e6d3 0%, #e8d4c4 100%);
   min-height: 100vh;
-  padding: 12px;
+  padding: 12px 12px 80px;
   color: #333;
 }
 
@@ -21,48 +21,60 @@ header {
   text-align: center;
   background: rgba(255,255,255,0.95);
   border-radius: 14px;
-  padding: 20px;
-  margin-bottom: 16px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
-header h1 { font-size: 24px; color: #7a5c0a; }
-header p { font-size: 12px; color: #aaa; margin-top: 4px; }
+header h1 { font-size: 22px; color: #7a5c0a; }
+header p  { font-size: 12px; color: #bbb; margin-top: 3px; }
 
-/* Tabs */
-.tabs {
-  display: flex;
+/* ボトムタブ */
+.bottom-tabs {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
   background: white;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-top: 1px solid #e8e8e8;
+  display: flex;
+  z-index: 50;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
 }
-.tab-btn {
+.bottom-tab {
   flex: 1;
-  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px 12px;
   border: none;
   background: none;
-  border-radius: 9px;
-  font-size: 14px;
+  color: #bbb;
+  font-size: 10px;
   font-weight: 600;
-  color: #999;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: color 0.2s;
+  gap: 3px;
 }
-.tab-btn.active {
-  background: #7a5c0a;
-  color: white;
-}
+.bottom-tab .icon { font-size: 22px; line-height: 1; }
+.bottom-tab.active { color: #7a5c0a; }
 
-/* Card */
+/* カード */
 .card {
   background: white;
   border-radius: 14px;
   padding: 18px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #7a5c0a;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0e8d8;
+}
 
+/* フォーム */
 .form-group { margin-bottom: 16px; }
 .form-group label {
   display: block;
@@ -72,7 +84,7 @@ header p { font-size: 12px; color: #aaa; margin-top: 4px; }
   margin-bottom: 7px;
 }
 
-select, input[type="date"], input[type="number"], input[type="text"], textarea {
+select, input[type="date"], textarea {
   width: 100%;
   padding: 11px 13px;
   border: 1.5px solid #e5e5e5;
@@ -81,15 +93,25 @@ select, input[type="date"], input[type="number"], input[type="text"], textarea {
   font-family: inherit;
   color: #333;
   background: #fafafa;
-  transition: border-color 0.2s;
   -webkit-appearance: none;
   appearance: none;
+  transition: border-color 0.2s;
 }
-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
-select:focus, input:focus, textarea:focus { outline: none; border-color: #7a5c0a; background: #fffbf4; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-color: #fafafa;
+  padding-right: 36px;
+}
+select:focus, input:focus, textarea:focus {
+  outline: none;
+  border-color: #7a5c0a;
+  background: #fffbf4;
+}
 textarea { resize: vertical; min-height: 80px; }
 
-/* Range slider */
+/* スライダー */
 .range-wrapper { display: flex; align-items: center; gap: 12px; }
 input[type="range"] {
   flex: 1;
@@ -102,15 +124,14 @@ input[type="range"] {
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 24px; height: 24px;
   border-radius: 50%;
   background: #7a5c0a;
   cursor: pointer;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 .range-value {
-  min-width: 44px;
+  min-width: 48px;
   text-align: center;
   font-size: 16px;
   font-weight: 700;
@@ -120,42 +141,40 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 7px;
 }
 
-/* Water level */
-.water-presets { display: flex; gap: 8px; margin-bottom: 10px; }
-.water-preset-btn {
+/* 水加減ボタン */
+.water-btns { display: flex; gap: 8px; }
+.water-btn {
   flex: 1;
-  padding: 9px;
+  padding: 10px 6px;
   border: 1.5px solid #ddd;
   border-radius: 9px;
   background: white;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #777;
+  color: #888;
   cursor: pointer;
   transition: all 0.15s;
+  text-align: center;
 }
-.water-preset-btn.active {
+.water-btn.active {
   border-color: #7a5c0a;
   background: #fdf3e0;
   color: #7a5c0a;
 }
-.water-ml-row { display: flex; gap: 8px; align-items: center; }
-.water-ml-row label { white-space: nowrap; font-size: 12px; font-weight: 600; color: #888; margin: 0; }
-.water-ml-row input { width: 100px; }
 
-/* Stars */
-.stars { display: flex; gap: 6px; margin-top: 4px; }
+/* 星評価 */
+.stars { display: flex; gap: 8px; margin-top: 4px; }
 .star {
-  font-size: 32px;
+  font-size: 34px;
   cursor: pointer;
   color: #ddd;
   transition: all 0.15s;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 .star.lit { color: #f5a623; }
-.star:hover { transform: scale(1.2); }
 
-/* Buttons */
+/* ボタン */
 .btn-primary {
   width: 100%;
   padding: 14px;
@@ -166,10 +185,8 @@ input[type="range"]::-webkit-slider-thumb {
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
 }
 .btn-primary:active { background: #5c4407; }
-
 .btn-secondary {
   width: 100%;
   padding: 11px;
@@ -183,131 +200,95 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: 8px;
 }
 .btn-secondary:active { background: #e0e0e0; }
-
-.btn-icon {
-  padding: 9px 16px;
+.btn-sm {
+  padding: 7px 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 7px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
 }
+.btn-red   { background: #ef5350; color: white; }
+.btn-red:active   { background: #c62828; }
 .btn-green { background: #4caf50; color: white; }
 .btn-green:active { background: #388e3c; }
-.btn-blue { background: #2196f3; color: white; }
-.btn-blue:active { background: #1565c0; }
-.btn-red { background: #ef5350; color: white; }
-.btn-red:active { background: #c62828; }
+.btn-blue  { background: #2196f3; color: white; }
+.btn-blue:active  { background: #1565c0; }
 
-/* Records */
-.record-count { font-size: 13px; color: #888; margin-bottom: 12px; }
+/* 記録一覧 */
 .record-actions { display: flex; gap: 8px; margin-bottom: 14px; }
+.record-count { font-size: 13px; color: #999; margin-bottom: 10px; }
 
 .record-card {
   background: #fdf9f5;
   border-left: 4px solid #7a5c0a;
   border-radius: 10px;
-  padding: 14px;
+  padding: 13px;
   margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
 }
-.record-body { flex: 1; min-width: 0; }
-.rec-date { font-size: 12px; color: #999; margin-bottom: 3px; }
-.rec-name { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 5px; }
-.rec-meta { font-size: 12px; color: #777; margin-bottom: 6px; }
+.rec-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.rec-body { flex: 1; min-width: 0; }
+.rec-date   { font-size: 12px; color: #aaa; margin-bottom: 2px; }
+.rec-name   { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 4px; }
+.rec-meta   { font-size: 12px; color: #888; }
 .rec-comment {
-  font-size: 13px;
-  color: #555;
+  font-size: 13px; color: #555;
   background: white;
   padding: 7px 10px;
   border-radius: 6px;
   border-left: 2px solid #e0d4c0;
-  margin-top: 6px;
+  margin-top: 8px;
   word-break: break-all;
 }
-.rec-stars { font-size: 16px; margin-top: 5px; color: #f5a623; }
+.rec-stars { font-size: 15px; color: #f5a623; margin-top: 6px; }
 
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #bbb;
+  color: #ccc;
   font-size: 15px;
+  line-height: 2;
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 100;
+/* 設定 */
+.setting-section { margin-bottom: 20px; }
+.setting-section h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
 }
-.modal {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  max-width: 480px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-.modal-header h2 { font-size: 18px; color: #333; }
-.btn-close {
-  background: none;
-  border: none;
-  font-size: 22px;
-  color: #aaa;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-.variety-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-bottom: 14px;
-}
-.variety-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.variety-grid { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+.v-chip {
+  display: inline-flex; align-items: center; gap: 5px;
   background: #f2f2f2;
-  padding: 5px 10px;
+  padding: 5px 11px;
   border-radius: 20px;
   font-size: 13px;
+  color: #555;
 }
-.variety-chip.custom { background: #e8f4fd; }
+.v-chip.custom { background: #e8f4fd; color: #1565c0; }
 .chip-del {
-  background: none;
-  border: none;
-  color: #f44336;
-  font-size: 15px;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
+  background: none; border: none;
+  color: #f44336; font-size: 16px;
+  cursor: pointer; padding: 0; line-height: 1;
 }
 .add-row { display: flex; gap: 8px; }
-.add-row input { flex: 1; }
-.add-row button { white-space: nowrap; }
+.add-row input {
+  flex: 1; padding: 10px 12px;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 9px; font-size: 14px;
+  font-family: inherit;
+  -webkit-appearance: none;
+}
+.add-row input:focus { outline: none; border-color: #7a5c0a; }
 
 .hidden { display: none; }
 
-@media (max-width: 400px) {
-  .water-presets { flex-direction: column; }
-  .record-actions { flex-direction: column; }
+@media (max-width: 380px) {
+  .water-btns { flex-direction: column; }
 }
 </style>
 </head>
@@ -318,21 +299,18 @@ input[type="range"]::-webkit-slider-thumb {
     <p>毎日の炊き方を記録して、最高のお米を探そう</p>
   </header>
 
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-form" onclick="switchTab('form')">📝 新規記録</button>
-    <button class="tab-btn" id="tab-records" onclick="switchTab('records')">📋 過去記録</button>
-  </div>
-
-  <!-- 新規記録 -->
-  <div id="page-form">
+  <!-- ===== 新規登録 ===== -->
+  <div id="page-new">
     <div class="card">
+      <div class="card-title">📝 新規登録</div>
+
       <div class="form-group">
         <label>🗓️ 炊いた日にち</label>
         <input type="date" id="inp-date">
       </div>
 
       <div class="form-group">
-        <label>📍 都道府県（産地）</label>
+        <label>📍 産地（都道府県）</label>
         <select id="inp-pref"></select>
       </div>
 
@@ -344,22 +322,18 @@ input[type="range"]::-webkit-slider-thumb {
       <div class="form-group">
         <label>📊 合数</label>
         <div class="range-wrapper">
-          <input type="range" min="1" max="10" value="5" id="inp-amount" oninput="document.getElementById('amount-val').textContent=this.value+'合'">
+          <input type="range" min="1" max="10" value="5" id="inp-amount"
+            oninput="document.getElementById('amount-val').textContent=this.value+'合'">
           <div class="range-value" id="amount-val">5合</div>
         </div>
       </div>
 
       <div class="form-group">
         <label>💧 水加減</label>
-        <div class="water-presets">
-          <button class="water-preset-btn active" onclick="setWater('exact',this)">メモリ丁度</button>
-          <button class="water-preset-btn" onclick="setWater('more',this)">多め</button>
-          <button class="water-preset-btn" onclick="setWater('less',this)">少なめ</button>
-        </div>
-        <div class="water-ml-row">
-          <label>細かく指定:</label>
-          <input type="number" id="inp-ml" placeholder="例: 360 ml" min="100" max="2000">
-          <span style="font-size:14px;color:#888">ml</span>
+        <div class="water-btns">
+          <button class="water-btn active" onclick="setWater('exact',this)">メモリ丁度</button>
+          <button class="water-btn" onclick="setWater('more',this)">多め</button>
+          <button class="water-btn" onclick="setWater('less',this)">少なめ</button>
         </div>
       </div>
 
@@ -384,37 +358,72 @@ input[type="range"]::-webkit-slider-thumb {
     </div>
   </div>
 
-  <!-- 過去記録 -->
+  <!-- ===== 過去記録 ===== -->
   <div id="page-records" class="hidden">
     <div class="card">
+      <div class="card-title">📋 過去記録</div>
       <div class="record-actions">
-        <button class="btn-icon btn-green" onclick="exportCSV()">📥 CSVエクスポート</button>
-        <button class="btn-icon btn-blue" onclick="openModal()">⚙️ 銘柄管理</button>
+        <button class="btn-sm btn-green" onclick="exportCSV()">📥 CSVエクスポート</button>
       </div>
-      <p class="record-count" id="record-count">0件の記録</p>
+      <p class="record-count" id="record-count">0件</p>
       <div id="record-list"></div>
     </div>
   </div>
-</div>
 
-<!-- 銘柄管理モーダル -->
-<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModalOutside(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <h2>🌾 銘柄管理</h2>
-      <button class="btn-close" onclick="closeModal()">✕</button>
-    </div>
-    <p style="font-size:13px;color:#888;margin-bottom:12px;">プリセット銘柄（灰色）は削除できません。追加した銘柄（青色）は削除可能です。</p>
-    <div class="variety-grid" id="variety-chips"></div>
-    <div class="add-row">
-      <input type="text" id="inp-new-variety" placeholder="新しい銘柄名を入力">
-      <button class="btn-icon btn-blue" onclick="addVariety()">追加</button>
+  <!-- ===== 設定・管理 ===== -->
+  <div id="page-settings" class="hidden">
+    <div class="card">
+      <div class="card-title">⚙️ 設定・管理</div>
+
+      <!-- 銘柄管理 -->
+      <div class="setting-section">
+        <h3>🌾 銘柄リスト</h3>
+        <div class="variety-grid" id="variety-chips"></div>
+        <div class="add-row">
+          <input type="text" id="inp-new-variety" placeholder="新しい銘柄名">
+          <button class="btn-sm btn-blue" onclick="addVariety()">追加</button>
+        </div>
+      </div>
+
+      <!-- データ管理 -->
+      <div class="setting-section">
+        <h3>📦 データ管理</h3>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-sm btn-green" onclick="exportCSV()">📥 CSVエクスポート</button>
+          <button class="btn-sm btn-red" onclick="clearAllRecords()">🗑️ 全記録を削除</button>
+        </div>
+        <p style="font-size:12px;color:#bbb;margin-top:10px;">
+          データはブラウザのlocalStorageに保存されています。
+        </p>
+      </div>
+
+      <!-- アプリ情報 -->
+      <div class="setting-section">
+        <h3>ℹ️ アプリ情報</h3>
+        <p style="font-size:13px;color:#888;line-height:1.7;">
+          お米記録帳 v1.0<br>
+          記録件数: <span id="info-count">0</span>件 ／
+          カスタム銘柄: <span id="info-varieties">0</span>種
+        </p>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- ボトムタブ -->
+<nav class="bottom-tabs">
+  <button class="bottom-tab active" id="tab-new" onclick="switchTab('new')">
+    <span class="icon">📝</span>新規登録
+  </button>
+  <button class="bottom-tab" id="tab-records" onclick="switchTab('records')">
+    <span class="icon">📋</span>過去記録
+  </button>
+  <button class="bottom-tab" id="tab-settings" onclick="switchTab('settings')">
+    <span class="icon">⚙️</span>設定・管理
+  </button>
+</nav>
+
 <script>
-// ============ データ ============
 const PREFECTURES = [
   '北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県',
   '茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県',
@@ -440,25 +449,26 @@ let customVarieties = [];
 let currentWater = 'exact';
 let currentRating = 0;
 
-// ============ 初期化 ============
 function init() {
   records = JSON.parse(localStorage.getItem('riceRecords') || '[]');
   customVarieties = JSON.parse(localStorage.getItem('customVarieties') || '[]');
 
-  // 今日の日付セット
-  document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('inp-date').value = today();
 
-  // 都道府県セット
-  const prefSel = document.getElementById('inp-pref');
+  // 都道府県
+  const sel = document.getElementById('inp-pref');
   PREFECTURES.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p; opt.textContent = p;
-    if (p === '秋田県') opt.selected = true;
-    prefSel.appendChild(opt);
+    const o = document.createElement('option');
+    o.value = o.textContent = p;
+    if (p === '秋田県') o.selected = true;
+    sel.appendChild(o);
   });
 
   renderVarietySelect();
-  renderRecords();
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0];
 }
 
 function getAllVarieties() {
@@ -470,91 +480,80 @@ function renderVarietySelect() {
   const prev = sel.value;
   sel.innerHTML = '';
   getAllVarieties().forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v; opt.textContent = v;
-    sel.appendChild(opt);
+    const o = document.createElement('option');
+    o.value = o.textContent = v;
+    sel.appendChild(o);
   });
   if (prev) sel.value = prev;
 }
 
-// ============ フォーム ============
+// ---- フォーム ----
 function setWater(val, btn) {
   currentWater = val;
-  document.querySelectorAll('.water-preset-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.water-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('inp-ml').value = '';
 }
 
 function setStar(n) {
   currentRating = n;
-  document.querySelectorAll('#stars-form .star').forEach((s, i) => {
-    s.classList.toggle('lit', i < n);
-  });
+  document.querySelectorAll('#stars-form .star').forEach((s,i) => s.classList.toggle('lit', i < n));
 }
 
 function resetForm() {
-  document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('inp-date').value = today();
   document.getElementById('inp-pref').value = '秋田県';
   document.getElementById('inp-variety').value = 'あきたこまち';
   document.getElementById('inp-amount').value = 5;
   document.getElementById('amount-val').textContent = '5合';
-  document.getElementById('inp-ml').value = '';
   document.getElementById('inp-comment').value = '';
   currentWater = 'exact';
   currentRating = 0;
-  document.querySelectorAll('.water-preset-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.querySelectorAll('.water-btn').forEach((b,i) => b.classList.toggle('active', i===0));
   document.querySelectorAll('#stars-form .star').forEach(s => s.classList.remove('lit'));
 }
 
 function saveRecord() {
-  const date = document.getElementById('inp-date').value;
-  const pref = document.getElementById('inp-pref').value;
+  const date    = document.getElementById('inp-date').value;
+  const pref    = document.getElementById('inp-pref').value;
   const variety = document.getElementById('inp-variety').value;
   if (!date || !pref || !variety) { alert('日付・産地・銘柄は必須です'); return; }
 
-  const ml = document.getElementById('inp-ml').value;
-  const record = {
-    id: Date.now(),
-    date,
-    prefecture: pref,
-    variety,
+  records.unshift({
+    id: Date.now(), date, prefecture: pref, variety,
     amount: parseInt(document.getElementById('inp-amount').value),
-    waterPreset: ml ? 'custom' : currentWater,
-    waterMl: ml ? parseInt(ml) : null,
+    water: currentWater,
     comment: document.getElementById('inp-comment').value.trim(),
     rating: currentRating
-  };
-
-  records.unshift(record);
+  });
   localStorage.setItem('riceRecords', JSON.stringify(records));
-  renderRecords();
   resetForm();
   switchTab('records');
 }
 
-// ============ 記録一覧 ============
+// ---- 記録一覧 ----
 function renderRecords() {
+  document.getElementById('record-count').textContent = records.length + '件';
   const list = document.getElementById('record-list');
-  document.getElementById('record-count').textContent = records.length + '件の記録';
-  if (records.length === 0) {
-    list.innerHTML = '<div class="empty-state">🍚<br>まだ記録がありません</div>';
+  if (!records.length) {
+    list.innerHTML = '<div class="empty-state">🍚<br>まだ記録がありません<br>新規登録から記録しよう</div>';
     return;
   }
   list.innerHTML = records.map(r => {
-    const waterStr = r.waterMl ? r.waterMl + 'ml' : (WATER_LABELS[r.waterPreset] || r.waterPreset);
-    const stars = r.rating > 0 ? '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) : '';
-    const comment = r.comment ? `<div class="rec-comment">${escHtml(r.comment)}</div>` : '';
-    const ratingEl = stars ? `<div class="rec-stars">${stars}</div>` : '';
+    const stars = r.rating > 0
+      ? `<div class="rec-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>` : '';
+    const comment = r.comment
+      ? `<div class="rec-comment">${esc(r.comment)}</div>` : '';
     return `
       <div class="record-card">
-        <div class="record-body">
-          <div class="rec-date">${r.date}</div>
-          <div class="rec-name">${escHtml(r.prefecture)} / ${escHtml(r.variety)}</div>
-          <div class="rec-meta">${r.amount}合 ／ 水: ${waterStr}</div>
-          ${comment}
-          ${ratingEl}
+        <div class="rec-row">
+          <div class="rec-body">
+            <div class="rec-date">${r.date}</div>
+            <div class="rec-name">${esc(r.prefecture)} ／ ${esc(r.variety)}</div>
+            <div class="rec-meta">${r.amount}合 ・ 水加減: ${WATER_LABELS[r.water]}</div>
+            ${comment}${stars}
+          </div>
+          <button class="btn-sm btn-red" onclick="deleteRecord(${r.id})">削除</button>
         </div>
-        <button class="btn-icon btn-red" onclick="deleteRecord(${r.id})">削除</button>
       </div>`;
   }).join('');
 }
@@ -565,41 +564,17 @@ function deleteRecord(id) {
   renderRecords();
 }
 
-// ============ CSV ============
-function exportCSV() {
-  if (records.length === 0) { alert('記録がありません'); return; }
-  const header = '日付,都道府県,銘柄,合数,水加減,感想,総評';
-  const rows = records.map(r => {
-    const w = r.waterMl ? r.waterMl+'ml' : (WATER_LABELS[r.waterPreset] || r.waterPreset);
-    return [r.date, r.prefecture, r.variety, r.amount+'合', w,
-      '"'+r.comment.replace(/"/g,'""')+'"', '★'.repeat(r.rating)].join(',');
-  });
-  const csv = '\uFEFF' + [header, ...rows].join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
-  a.download = 'rice-record-' + new Date().toISOString().split('T')[0] + '.csv';
-  a.click();
-}
+// ---- 設定・管理 ----
+function renderSettings() {
+  document.getElementById('info-count').textContent = records.length;
+  document.getElementById('info-varieties').textContent = customVarieties.length;
 
-// ============ 銘柄管理モーダル ============
-function openModal() {
-  renderVarietyChips();
-  document.getElementById('modal-overlay').classList.remove('hidden');
-}
-function closeModal() {
-  document.getElementById('modal-overlay').classList.add('hidden');
-  renderVarietySelect();
-}
-function closeModalOutside(e) {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-}
-
-function renderVarietyChips() {
   const grid = document.getElementById('variety-chips');
   grid.innerHTML = getAllVarieties().map(v => {
     const isCustom = customVarieties.includes(v);
-    const delBtn = isCustom ? `<button class="chip-del" onclick="removeVariety('${escAttr(v)}')">×</button>` : '';
-    return `<span class="variety-chip ${isCustom?'custom':''}">${escHtml(v)}${delBtn}</span>`;
+    const del = isCustom
+      ? `<button class="chip-del" onclick="removeVariety('${escAttr(v)}')">×</button>` : '';
+    return `<span class="v-chip ${isCustom?'custom':''}">${esc(v)}${del}</span>`;
   }).join('');
 }
 
@@ -611,31 +586,55 @@ function addVariety() {
   customVarieties.push(val);
   localStorage.setItem('customVarieties', JSON.stringify(customVarieties));
   inp.value = '';
-  renderVarietyChips();
+  renderVarietySelect();
+  renderSettings();
 }
 
 function removeVariety(v) {
   customVarieties = customVarieties.filter(c => c !== v);
   localStorage.setItem('customVarieties', JSON.stringify(customVarieties));
-  renderVarietyChips();
+  renderVarietySelect();
+  renderSettings();
 }
 
-// ============ タブ切替 ============
+function clearAllRecords() {
+  if (records.length === 0) { alert('記録がありません'); return; }
+  const yes = window.confirm('全ての記録を削除しますか？\nこの操作は取り消せません。');
+  if (!yes) return;
+  records = [];
+  localStorage.setItem('riceRecords', JSON.stringify(records));
+  renderSettings();
+}
+
+// ---- CSV ----
+function exportCSV() {
+  if (!records.length) { alert('記録がありません'); return; }
+  const header = '日付,都道府県,銘柄,合数,水加減,感想,総評';
+  const rows = records.map(r =>
+    [r.date, r.prefecture, r.variety, r.amount+'合', WATER_LABELS[r.water],
+     '"'+(r.comment||'').replace(/"/g,'""')+'"',
+     '★'.repeat(r.rating)+'☆'.repeat(5-r.rating)].join(',')
+  );
+  const csv = '\uFEFF' + [header, ...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'rice-record-' + today() + '.csv';
+  a.click();
+}
+
+// ---- タブ ----
 function switchTab(tab) {
-  document.getElementById('page-form').classList.toggle('hidden', tab !== 'form');
-  document.getElementById('page-records').classList.toggle('hidden', tab !== 'records');
-  document.getElementById('tab-form').classList.toggle('active', tab === 'form');
-  document.getElementById('tab-records').classList.toggle('active', tab === 'records');
+  ['new','records','settings'].forEach(t => {
+    document.getElementById('page-'+t).classList.toggle('hidden', t !== tab);
+    document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+  });
   if (tab === 'records') renderRecords();
+  if (tab === 'settings') renderSettings();
 }
 
-// ============ ユーティリティ ============
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s) {
-  return String(s).replace(/'/g,"\\'");
-}
+// ---- util ----
+function esc(s)     { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
 
 init();
 </script>
