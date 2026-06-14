@@ -661,7 +661,7 @@ function renderRecords() {
       <div class="record-card">
         <div class="rec-row">
           <div class="rec-body">
-            <div class="rec-date">${r.date}</div>
+            <div class="rec-date">${formatDate(r.date)}</div>
             <div class="rec-name">${esc(r.prefecture)} ／ ${esc(r.variety)}</div>
             <div class="rec-meta">${r.amount}合 ・ 水加減: ${WATER_LABELS[r.water]}</div>
             ${comment}${stars}
@@ -800,6 +800,13 @@ function switchTab(tab) {
 function save() { localStorage.setItem('riceRecords', JSON.stringify(records)); }
 function esc(s)     { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
+function formatDate(dateStr) {
+  if (!dateStr) return dateStr;
+  const d = new Date(dateStr + 'T00:00:00');
+  const days = ['日','月','火','水','木','金','土'];
+  const dow = days[d.getDay()];
+  return `${dateStr}(${dow})`;
+}
 
 init();
 </script>
