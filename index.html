@@ -51,7 +51,6 @@ header p  { font-size: 12px; color: #bbb; margin-top: 3px; }
   font-size: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: color 0.2s;
   gap: 3px;
 }
 .bottom-tab .icon { font-size: 22px; line-height: 1; }
@@ -83,7 +82,6 @@ header p  { font-size: 12px; color: #bbb; margin-top: 3px; }
   color: #555;
   margin-bottom: 7px;
 }
-
 select, input[type="date"], textarea {
   width: 100%;
   padding: 11px 13px;
@@ -207,15 +205,18 @@ input[type="range"]::-webkit-slider-thumb {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
-.btn-red   { background: #ef5350; color: white; }
-.btn-red:active   { background: #c62828; }
-.btn-green { background: #4caf50; color: white; }
-.btn-green:active { background: #388e3c; }
-.btn-blue  { background: #2196f3; color: white; }
-.btn-blue:active  { background: #1565c0; }
+.btn-red    { background: #ef5350; color: white; }
+.btn-red:active    { background: #c62828; }
+.btn-green  { background: #4caf50; color: white; }
+.btn-green:active  { background: #388e3c; }
+.btn-blue   { background: #2196f3; color: white; }
+.btn-blue:active   { background: #1565c0; }
+.btn-orange { background: #ff9800; color: white; }
+.btn-orange:active { background: #e65100; }
 
-/* 記録一覧 */
+/* 記録カード */
 .record-actions { display: flex; gap: 8px; margin-bottom: 14px; }
 .record-count { font-size: 13px; color: #999; margin-bottom: 10px; }
 
@@ -238,9 +239,17 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 6px;
   border-left: 2px solid #e0d4c0;
   margin-top: 8px;
+  /* 省略表示 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
   word-break: break-all;
+  line-height: 1.5;
 }
 .rec-stars { font-size: 15px; color: #f5a623; margin-top: 6px; }
+.rec-btns  { display: flex; flex-direction: column; gap: 6px; }
 
 .empty-state {
   text-align: center;
@@ -256,7 +265,6 @@ input[type="range"]::-webkit-slider-thumb {
   font-size: 13px;
   font-weight: 700;
   color: #999;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 10px;
 }
@@ -266,8 +274,7 @@ input[type="range"]::-webkit-slider-thumb {
   background: #f2f2f2;
   padding: 5px 11px;
   border-radius: 20px;
-  font-size: 13px;
-  color: #555;
+  font-size: 13px; color: #555;
 }
 .v-chip.custom { background: #e8f4fd; color: #1565c0; }
 .chip-del {
@@ -284,6 +291,47 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
 }
 .add-row input:focus { outline: none; border-color: #7a5c0a; }
+
+/* 編集モーダル */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  padding: 0;
+}
+.modal {
+  background: white;
+  border-radius: 20px 20px 0 0;
+  padding: 20px 18px 32px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0e8d8;
+}
+.modal-header h2 { font-size: 17px; color: #7a5c0a; font-weight: 700; }
+.btn-close {
+  background: #f0f0f0; border: none;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  font-size: 16px; color: #888;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+}
+.btn-close:active { background: #ddd; }
+.modal-btns { display: flex; gap: 10px; margin-top: 16px; }
+.modal-btns button { flex: 1; }
 
 .hidden { display: none; }
 
@@ -303,22 +351,18 @@ input[type="range"]::-webkit-slider-thumb {
   <div id="page-new">
     <div class="card">
       <div class="card-title">📝 新規登録</div>
-
       <div class="form-group">
         <label>🗓️ 炊いた日にち</label>
         <input type="date" id="inp-date">
       </div>
-
       <div class="form-group">
         <label>📍 産地（都道府県）</label>
         <select id="inp-pref"></select>
       </div>
-
       <div class="form-group">
         <label>🌾 銘柄</label>
         <select id="inp-variety"></select>
       </div>
-
       <div class="form-group">
         <label>📊 合数</label>
         <div class="range-wrapper">
@@ -327,32 +371,28 @@ input[type="range"]::-webkit-slider-thumb {
           <div class="range-value" id="amount-val">5合</div>
         </div>
       </div>
-
       <div class="form-group">
         <label>💧 水加減</label>
-        <div class="water-btns">
-          <button class="water-btn active" onclick="setWater('exact',this)">メモリ丁度</button>
-          <button class="water-btn" onclick="setWater('more',this)">多め</button>
-          <button class="water-btn" onclick="setWater('less',this)">少なめ</button>
+        <div class="water-btns" id="water-btns-new">
+          <button class="water-btn active" onclick="setWater('exact',this,'new')">メモリ丁度</button>
+          <button class="water-btn" onclick="setWater('more',this,'new')">多め</button>
+          <button class="water-btn" onclick="setWater('less',this,'new')">少なめ</button>
         </div>
       </div>
-
       <div class="form-group">
         <label>💭 感想</label>
         <textarea id="inp-comment" placeholder="食べた感想、気づいたこと、改善案など…"></textarea>
       </div>
-
       <div class="form-group">
         <label>⭐ 総評</label>
-        <div class="stars" id="stars-form">
-          <span class="star" onclick="setStar(1)">★</span>
-          <span class="star" onclick="setStar(2)">★</span>
-          <span class="star" onclick="setStar(3)">★</span>
-          <span class="star" onclick="setStar(4)">★</span>
-          <span class="star" onclick="setStar(5)">★</span>
+        <div class="stars" id="stars-new">
+          <span class="star" onclick="setStar(1,'new')">★</span>
+          <span class="star" onclick="setStar(2,'new')">★</span>
+          <span class="star" onclick="setStar(3,'new')">★</span>
+          <span class="star" onclick="setStar(4,'new')">★</span>
+          <span class="star" onclick="setStar(5,'new')">★</span>
         </div>
       </div>
-
       <button class="btn-primary" onclick="saveRecord()">💾 記録する</button>
       <button class="btn-secondary" onclick="resetForm()">リセット</button>
     </div>
@@ -375,7 +415,6 @@ input[type="range"]::-webkit-slider-thumb {
     <div class="card">
       <div class="card-title">⚙️ 設定・管理</div>
 
-      <!-- 銘柄管理 -->
       <div class="setting-section">
         <h3>🌾 銘柄リスト</h3>
         <div class="variety-grid" id="variety-chips"></div>
@@ -385,7 +424,6 @@ input[type="range"]::-webkit-slider-thumb {
         </div>
       </div>
 
-      <!-- データ管理 -->
       <div class="setting-section">
         <h3>📦 データ管理</h3>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -397,15 +435,74 @@ input[type="range"]::-webkit-slider-thumb {
         </p>
       </div>
 
-      <!-- アプリ情報 -->
       <div class="setting-section">
         <h3>ℹ️ アプリ情報</h3>
         <p style="font-size:13px;color:#888;line-height:1.7;">
-          お米記録帳 v1.0<br>
+          お米記録帳 v1.1<br>
           記録件数: <span id="info-count">0</span>件 ／
           カスタム銘柄: <span id="info-varieties">0</span>種
         </p>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 編集モーダル ===== -->
+<div class="modal-overlay hidden" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>✏️ 記録を修正</h2>
+      <button class="btn-close" onclick="closeEditModal()">✕</button>
+    </div>
+
+    <input type="hidden" id="edit-id">
+
+    <div class="form-group">
+      <label>🗓️ 炊いた日にち</label>
+      <input type="date" id="edit-date">
+    </div>
+    <div class="form-group">
+      <label>📍 産地（都道府県）</label>
+      <select id="edit-pref"></select>
+    </div>
+    <div class="form-group">
+      <label>🌾 銘柄</label>
+      <select id="edit-variety"></select>
+    </div>
+    <div class="form-group">
+      <label>📊 合数</label>
+      <div class="range-wrapper">
+        <input type="range" min="1" max="10" value="5" id="edit-amount"
+          oninput="document.getElementById('edit-amount-val').textContent=this.value+'合'">
+        <div class="range-value" id="edit-amount-val">5合</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>💧 水加減</label>
+      <div class="water-btns" id="water-btns-edit">
+        <button class="water-btn active" onclick="setWater('exact',this,'edit')">メモリ丁度</button>
+        <button class="water-btn" onclick="setWater('more',this,'edit')">多め</button>
+        <button class="water-btn" onclick="setWater('less',this,'edit')">少なめ</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>💭 感想</label>
+      <textarea id="edit-comment" placeholder="食べた感想、気づいたこと、改善案など…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>⭐ 総評</label>
+      <div class="stars" id="stars-edit">
+        <span class="star" onclick="setStar(1,'edit')">★</span>
+        <span class="star" onclick="setStar(2,'edit')">★</span>
+        <span class="star" onclick="setStar(3,'edit')">★</span>
+        <span class="star" onclick="setStar(4,'edit')">★</span>
+        <span class="star" onclick="setStar(5,'edit')">★</span>
+      </div>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="updateRecord()">💾 保存する</button>
+      <button class="btn-secondary" style="margin-top:0" onclick="closeEditModal()">キャンセル</button>
     </div>
   </div>
 </div>
@@ -446,25 +543,26 @@ const WATER_LABELS = { exact:'メモリ丁度', more:'多め', less:'少なめ' 
 
 let records = [];
 let customVarieties = [];
-let currentWater = 'exact';
-let currentRating = 0;
+let currentWater = { new: 'exact', edit: 'exact' };
+let currentRating = { new: 0, edit: 0 };
 
+// ============ 初期化 ============
 function init() {
   records = JSON.parse(localStorage.getItem('riceRecords') || '[]');
   customVarieties = JSON.parse(localStorage.getItem('customVarieties') || '[]');
 
   document.getElementById('inp-date').value = today();
 
-  // 都道府県
-  const sel = document.getElementById('inp-pref');
   PREFECTURES.forEach(p => {
-    const o = document.createElement('option');
-    o.value = o.textContent = p;
-    if (p === '秋田県') o.selected = true;
-    sel.appendChild(o);
+    ['inp-pref','edit-pref'].forEach(id => {
+      const o = document.createElement('option');
+      o.value = o.textContent = p;
+      if (p === '秋田県') o.selected = true;
+      document.getElementById(id).appendChild(o);
+    });
   });
 
-  renderVarietySelect();
+  renderVarietySelects();
 }
 
 function today() {
@@ -475,30 +573,48 @@ function getAllVarieties() {
   return [...DEFAULT_VARIETIES, ...customVarieties].sort((a,b) => a.localeCompare(b,'ja'));
 }
 
-function renderVarietySelect() {
-  const sel = document.getElementById('inp-variety');
-  const prev = sel.value;
-  sel.innerHTML = '';
-  getAllVarieties().forEach(v => {
-    const o = document.createElement('option');
-    o.value = o.textContent = v;
-    sel.appendChild(o);
+function renderVarietySelects() {
+  ['inp-variety','edit-variety'].forEach(id => {
+    const sel = document.getElementById(id);
+    const prev = sel.value;
+    sel.innerHTML = '';
+    getAllVarieties().forEach(v => {
+      const o = document.createElement('option');
+      o.value = o.textContent = v;
+      sel.appendChild(o);
+    });
+    if (prev) sel.value = prev;
   });
-  if (prev) sel.value = prev;
 }
 
-// ---- フォーム ----
-function setWater(val, btn) {
-  currentWater = val;
-  document.querySelectorAll('.water-btn').forEach(b => b.classList.remove('active'));
+// ============ 水加減・星（new / edit 共用） ============
+function setWater(val, btn, ctx) {
+  currentWater[ctx] = val;
+  document.querySelectorAll(`#water-btns-${ctx} .water-btn`)
+    .forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-function setStar(n) {
-  currentRating = n;
-  document.querySelectorAll('#stars-form .star').forEach((s,i) => s.classList.toggle('lit', i < n));
+function setStar(n, ctx) {
+  currentRating[ctx] = n;
+  document.querySelectorAll(`#stars-${ctx} .star`)
+    .forEach((s,i) => s.classList.toggle('lit', i < n));
 }
 
+function setWaterUI(ctx, val) {
+  currentWater[ctx] = val;
+  const btns = document.querySelectorAll(`#water-btns-${ctx} .water-btn`);
+  const map = { exact:0, more:1, less:2 };
+  btns.forEach((b,i) => b.classList.toggle('active', i === map[val]));
+}
+
+function setStarUI(ctx, n) {
+  currentRating[ctx] = n;
+  document.querySelectorAll(`#stars-${ctx} .star`)
+    .forEach((s,i) => s.classList.toggle('lit', i < n));
+}
+
+// ============ 新規登録 ============
 function resetForm() {
   document.getElementById('inp-date').value = today();
   document.getElementById('inp-pref').value = '秋田県';
@@ -506,10 +622,8 @@ function resetForm() {
   document.getElementById('inp-amount').value = 5;
   document.getElementById('amount-val').textContent = '5合';
   document.getElementById('inp-comment').value = '';
-  currentWater = 'exact';
-  currentRating = 0;
-  document.querySelectorAll('.water-btn').forEach((b,i) => b.classList.toggle('active', i===0));
-  document.querySelectorAll('#stars-form .star').forEach(s => s.classList.remove('lit'));
+  setWaterUI('new', 'exact');
+  setStarUI('new', 0);
 }
 
 function saveRecord() {
@@ -521,16 +635,16 @@ function saveRecord() {
   records.unshift({
     id: Date.now(), date, prefecture: pref, variety,
     amount: parseInt(document.getElementById('inp-amount').value),
-    water: currentWater,
+    water: currentWater.new,
     comment: document.getElementById('inp-comment').value.trim(),
-    rating: currentRating
+    rating: currentRating.new
   });
-  localStorage.setItem('riceRecords', JSON.stringify(records));
+  save();
   resetForm();
   switchTab('records');
 }
 
-// ---- 記録一覧 ----
+// ============ 過去記録 ============
 function renderRecords() {
   document.getElementById('record-count').textContent = records.length + '件';
   const list = document.getElementById('record-list');
@@ -552,7 +666,10 @@ function renderRecords() {
             <div class="rec-meta">${r.amount}合 ・ 水加減: ${WATER_LABELS[r.water]}</div>
             ${comment}${stars}
           </div>
-          <button class="btn-sm btn-red" onclick="deleteRecord(${r.id})">削除</button>
+          <div class="rec-btns">
+            <button class="btn-sm btn-orange" onclick="openEditModal(${r.id})">編集</button>
+            <button class="btn-sm btn-red"    onclick="deleteRecord(${r.id})">削除</button>
+          </div>
         </div>
       </div>`;
   }).join('');
@@ -560,21 +677,69 @@ function renderRecords() {
 
 function deleteRecord(id) {
   records = records.filter(r => r.id !== id);
-  localStorage.setItem('riceRecords', JSON.stringify(records));
+  save();
   renderRecords();
 }
 
-// ---- 設定・管理 ----
+// ============ 編集モーダル ============
+function openEditModal(id) {
+  const r = records.find(r => r.id === id);
+  if (!r) return;
+
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-date').value = r.date;
+  document.getElementById('edit-pref').value = r.prefecture;
+  document.getElementById('edit-variety').value = r.variety;
+  document.getElementById('edit-amount').value = r.amount;
+  document.getElementById('edit-amount-val').textContent = r.amount + '合';
+  document.getElementById('edit-comment').value = r.comment || '';
+
+  setWaterUI('edit', r.water || 'exact');
+  setStarUI('edit', r.rating || 0);
+
+  document.getElementById('edit-modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function updateRecord() {
+  const id      = parseInt(document.getElementById('edit-id').value);
+  const date    = document.getElementById('edit-date').value;
+  const pref    = document.getElementById('edit-pref').value;
+  const variety = document.getElementById('edit-variety').value;
+  if (!date || !pref || !variety) { alert('日付・産地・銘柄は必須です'); return; }
+
+  records = records.map(r => r.id === id ? {
+    ...r, date, prefecture: pref, variety,
+    amount: parseInt(document.getElementById('edit-amount').value),
+    water: currentWater.edit,
+    comment: document.getElementById('edit-comment').value.trim(),
+    rating: currentRating.edit
+  } : r);
+
+  save();
+  closeEditModal();
+  renderRecords();
+}
+
+// モーダル外クリックで閉じる
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditModal();
+});
+
+// ============ 設定・管理 ============
 function renderSettings() {
   document.getElementById('info-count').textContent = records.length;
   document.getElementById('info-varieties').textContent = customVarieties.length;
 
-  const grid = document.getElementById('variety-chips');
-  grid.innerHTML = getAllVarieties().map(v => {
-    const isCustom = customVarieties.includes(v);
-    const del = isCustom
-      ? `<button class="chip-del" onclick="removeVariety('${escAttr(v)}')">×</button>` : '';
-    return `<span class="v-chip ${isCustom?'custom':''}">${esc(v)}${del}</span>`;
+  document.getElementById('variety-chips').innerHTML = getAllVarieties().map(v => {
+    const isC = customVarieties.includes(v);
+    const del = isC ? `<button class="chip-del" onclick="removeVariety('${escAttr(v)}')">×</button>` : '';
+    return `<span class="v-chip ${isC?'custom':''}">${esc(v)}${del}</span>`;
   }).join('');
 }
 
@@ -586,27 +751,26 @@ function addVariety() {
   customVarieties.push(val);
   localStorage.setItem('customVarieties', JSON.stringify(customVarieties));
   inp.value = '';
-  renderVarietySelect();
+  renderVarietySelects();
   renderSettings();
 }
 
 function removeVariety(v) {
   customVarieties = customVarieties.filter(c => c !== v);
   localStorage.setItem('customVarieties', JSON.stringify(customVarieties));
-  renderVarietySelect();
+  renderVarietySelects();
   renderSettings();
 }
 
 function clearAllRecords() {
-  if (records.length === 0) { alert('記録がありません'); return; }
-  const yes = window.confirm('全ての記録を削除しますか？\nこの操作は取り消せません。');
-  if (!yes) return;
+  if (!records.length) { alert('記録がありません'); return; }
+  if (!window.confirm('全ての記録を削除しますか？\nこの操作は取り消せません。')) return;
   records = [];
-  localStorage.setItem('riceRecords', JSON.stringify(records));
+  save();
   renderSettings();
 }
 
-// ---- CSV ----
+// ============ CSV ============
 function exportCSV() {
   if (!records.length) { alert('記録がありません'); return; }
   const header = '日付,都道府県,銘柄,合数,水加減,感想,総評';
@@ -622,7 +786,7 @@ function exportCSV() {
   a.click();
 }
 
-// ---- タブ ----
+// ============ タブ ============
 function switchTab(tab) {
   ['new','records','settings'].forEach(t => {
     document.getElementById('page-'+t).classList.toggle('hidden', t !== tab);
@@ -632,7 +796,8 @@ function switchTab(tab) {
   if (tab === 'settings') renderSettings();
 }
 
-// ---- util ----
+// ============ ユーティリティ ============
+function save() { localStorage.setItem('riceRecords', JSON.stringify(records)); }
 function esc(s)     { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escAttr(s) { return String(s).replace(/'/g,"\\'"); }
 
