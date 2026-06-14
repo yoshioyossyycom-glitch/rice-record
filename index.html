@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お米記録帳</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans JP', sans-serif;
+  background: linear-gradient(135deg, #f5e6d3 0%, #e8d4c4 100%);
+  min-height: 100vh;
+  padding: 12px;
+  color: #333;
+}
+
+.container { max-width: 600px; margin: 0 auto; }
+
+header {
+  text-align: center;
+  background: rgba(255,255,255,0.95);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+header h1 { font-size: 24px; color: #7a5c0a; }
+header p { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #999;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab-btn.active {
+  background: #7a5c0a;
+  color: white;
+}
+
+/* Card */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 7px;
+}
+
+select, input[type="date"], input[type="number"], input[type="text"], textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 9px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #333;
+  background: #fafafa;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+select:focus, input:focus, textarea:focus { outline: none; border-color: #7a5c0a; background: #fffbf4; }
+textarea { resize: vertical; min-height: 80px; }
+
+/* Range slider */
+.range-wrapper { display: flex; align-items: center; gap: 12px; }
+input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #e0e0e0;
+  border: none;
+  padding: 0;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #7a5c0a;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.range-value {
+  min-width: 44px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #7a5c0a;
+  background: #fdf3e0;
+  padding: 5px 8px;
+  border-radius: 7px;
+}
+
+/* Water level */
+.water-presets { display: flex; gap: 8px; margin-bottom: 10px; }
+.water-preset-btn {
+  flex: 1;
+  padding: 9px;
+  border: 1.5px solid #ddd;
+  border-radius: 9px;
+  background: white;
+  font-size: 13px;
+  font-weight: 600;
+  color: #777;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.water-preset-btn.active {
+  border-color: #7a5c0a;
+  background: #fdf3e0;
+  color: #7a5c0a;
+}
+.water-ml-row { display: flex; gap: 8px; align-items: center; }
+.water-ml-row label { white-space: nowrap; font-size: 12px; font-weight: 600; color: #888; margin: 0; }
+.water-ml-row input { width: 100px; }
+
+/* Stars */
+.stars { display: flex; gap: 6px; margin-top: 4px; }
+.star {
+  font-size: 32px;
+  cursor: pointer;
+  color: #ddd;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.star.lit { color: #f5a623; }
+.star:hover { transform: scale(1.2); }
+
+/* Buttons */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: #7a5c0a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary:active { background: #5c4407; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 11px;
+  background: #f0f0f0;
+  color: #555;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.btn-secondary:active { background: #e0e0e0; }
+
+.btn-icon {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-green { background: #4caf50; color: white; }
+.btn-green:active { background: #388e3c; }
+.btn-blue { background: #2196f3; color: white; }
+.btn-blue:active { background: #1565c0; }
+.btn-red { background: #ef5350; color: white; }
+.btn-red:active { background: #c62828; }
+
+/* Records */
+.record-count { font-size: 13px; color: #888; margin-bottom: 12px; }
+.record-actions { display: flex; gap: 8px; margin-bottom: 14px; }
+
+.record-card {
+  background: #fdf9f5;
+  border-left: 4px solid #7a5c0a;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.record-body { flex: 1; min-width: 0; }
+.rec-date { font-size: 12px; color: #999; margin-bottom: 3px; }
+.rec-name { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 5px; }
+.rec-meta { font-size: 12px; color: #777; margin-bottom: 6px; }
+.rec-comment {
+  font-size: 13px;
+  color: #555;
+  background: white;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border-left: 2px solid #e0d4c0;
+  margin-top: 6px;
+  word-break: break-all;
+}
+.rec-stars { font-size: 16px; margin-top: 5px; color: #f5a623; }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #bbb;
+  font-size: 15px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+.modal {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.modal-header h2 { font-size: 18px; color: #333; }
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.variety-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+.variety-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f2f2f2;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+.variety-chip.custom { background: #e8f4fd; }
+.chip-del {
+  background: none;
+  border: none;
+  color: #f44336;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.add-row { display: flex; gap: 8px; }
+.add-row input { flex: 1; }
+.add-row button { white-space: nowrap; }
+
+.hidden { display: none; }
+
+@media (max-width: 400px) {
+  .water-presets { flex-direction: column; }
+  .record-actions { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🍚 お米記録帳</h1>
+    <p>毎日の炊き方を記録して、最高のお米を探そう</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-form" onclick="switchTab('form')">📝 新規記録</button>
+    <button class="tab-btn" id="tab-records" onclick="switchTab('records')">📋 過去記録</button>
+  </div>
+
+  <!-- 新規記録 -->
+  <div id="page-form">
+    <div class="card">
+      <div class="form-group">
+        <label>🗓️ 炊いた日にち</label>
+        <input type="date" id="inp-date">
+      </div>
+
+      <div class="form-group">
+        <label>📍 都道府県（産地）</label>
+        <select id="inp-pref"></select>
+      </div>
+
+      <div class="form-group">
+        <label>🌾 銘柄</label>
+        <select id="inp-variety"></select>
+      </div>
+
+      <div class="form-group">
+        <label>📊 合数</label>
+        <div class="range-wrapper">
+          <input type="range" min="1" max="10" value="5" id="inp-amount" oninput="document.getElementById('amount-val').textContent=this.value+'合'">
+          <div class="range-value" id="amount-val">5合</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>💧 水加減</label>
+        <div class="water-presets">
+          <button class="water-preset-btn active" onclick="setWater('exact',this)">メモリ丁度</button>
+          <button class="water-preset-btn" onclick="setWater('more',this)">多め</button>
+          <button class="water-preset-btn" onclick="setWater('less',this)">少なめ</button>
+        </div>
+        <div class="water-ml-row">
+          <label>細かく指定:</label>
+          <input type="number" id="inp-ml" placeholder="例: 360 ml" min="100" max="2000">
+          <span style="font-size:14px;color:#888">ml</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>💭 感想</label>
+        <textarea id="inp-comment" placeholder="食べた感想、気づいたこと、改善案など…"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>⭐ 総評</label>
+        <div class="stars" id="stars-form">
+          <span class="star" onclick="setStar(1)">★</span>
+          <span class="star" onclick="setStar(2)">★</span>
+          <span class="star" onclick="setStar(3)">★</span>
+          <span class="star" onclick="setStar(4)">★</span>
+          <span class="star" onclick="setStar(5)">★</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="saveRecord()">💾 記録する</button>
+      <button class="btn-secondary" onclick="resetForm()">リセット</button>
+    </div>
+  </div>
+
+  <!-- 過去記録 -->
+  <div id="page-records" class="hidden">
+    <div class="card">
+      <div class="record-actions">
+        <button class="btn-icon btn-green" onclick="exportCSV()">📥 CSVエクスポート</button>
+        <button class="btn-icon btn-blue" onclick="openModal()">⚙️ 銘柄管理</button>
+      </div>
+      <p class="record-count" id="record-count">0件の記録</p>
+      <div id="record-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 銘柄管理モーダル -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>🌾 銘柄管理</h2>
+      <button class="btn-close" onclick="closeModal()">✕</button>
+    </div>
+    <p style="font-size:13px;color:#888;margin-bottom:12px;">プリセット銘柄（灰色）は削除できません。追加した銘柄（青色）は削除可能です。</p>
+    <div class="variety-grid" id="variety-chips"></div>
+    <div class="add-row">
+      <input type="text" id="inp-new-variety" placeholder="新しい銘柄名を入力">
+      <button class="btn-icon btn-blue" onclick="addVariety()">追加</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ データ ============
+const PREFECTURES = [
+  '北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県',
+  '茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県',
+  '新潟県','富山県','石川県','福井県','山梨県','長野県',
+  '岐阜県','静岡県','愛知県','三重県',
+  '滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県',
+  '鳥取県','島根県','岡山県','広島県','山口県',
+  '徳島県','香川県','愛媛県','高知県',
+  '福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'
+];
+
+const DEFAULT_VARIETIES = [
+  'あきたこまち','コシヒカリ','ミルキークイーン','新之助','つや姫',
+  'ひとめぼれ','ヒノヒカリ','さがびより','こしいぶき','日本晴',
+  'キヌヒカリ','ササニシキ','うおぬま越光','夢しずく','きぬむすめ',
+  'てんたかく','雪若丸','サキホコレ','ななつぼし','きたおまり'
+];
+
+const WATER_LABELS = { exact:'メモリ丁度', more:'多め', less:'少なめ' };
+
+let records = [];
+let customVarieties = [];
+let currentWater = 'exact';
+let currentRating = 0;
+
+// ============ 初期化 ============
+function init() {
+  records = JSON.parse(localStorage.getItem('riceRecords') || '[]');
+  customVarieties = JSON.parse(localStorage.getItem('customVarieties') || '[]');
+
+  // 今日の日付セット
+  document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
+
+  // 都道府県セット
+  const prefSel = document.getElementById('inp-pref');
+  PREFECTURES.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.textContent = p;
+    if (p === '秋田県') opt.selected = true;
+    prefSel.appendChild(opt);
+  });
+
+  renderVarietySelect();
+  renderRecords();
+}
+
+function getAllVarieties() {
+  return [...DEFAULT_VARIETIES, ...customVarieties].sort((a,b) => a.localeCompare(b,'ja'));
+}
+
+function renderVarietySelect() {
+  const sel = document.getElementById('inp-variety');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  getAllVarieties().forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = v;
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+}
+
+// ============ フォーム ============
+function setWater(val, btn) {
+  currentWater = val;
+  document.querySelectorAll('.water-preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('inp-ml').value = '';
+}
+
+function setStar(n) {
+  currentRating = n;
+  document.querySelectorAll('#stars-form .star').forEach((s, i) => {
+    s.classList.toggle('lit', i < n);
+  });
+}
+
+function resetForm() {
+  document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('inp-pref').value = '秋田県';
+  document.getElementById('inp-variety').value = 'あきたこまち';
+  document.getElementById('inp-amount').value = 5;
+  document.getElementById('amount-val').textContent = '5合';
+  document.getElementById('inp-ml').value = '';
+  document.getElementById('inp-comment').value = '';
+  currentWater = 'exact';
+  currentRating = 0;
+  document.querySelectorAll('.water-preset-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.querySelectorAll('#stars-form .star').forEach(s => s.classList.remove('lit'));
+}
+
+function saveRecord() {
+  const date = document.getElementById('inp-date').value;
+  const pref = document.getElementById('inp-pref').value;
+  const variety = document.getElementById('inp-variety').value;
+  if (!date || !pref || !variety) { alert('日付・産地・銘柄は必須です'); return; }
+
+  const ml = document.getElementById('inp-ml').value;
+  const record = {
+    id: Date.now(),
+    date,
+    prefecture: pref,
+    variety,
+    amount: parseInt(document.getElementById('inp-amount').value),
+    waterPreset: ml ? 'custom' : currentWater,
+    waterMl: ml ? parseInt(ml) : null,
+    comment: document.getElementById('inp-comment').value.trim(),
+    rating: currentRating
+  };
+
+  records.unshift(record);
+  localStorage.setItem('riceRecords', JSON.stringify(records));
+  renderRecords();
+  resetForm();
+  switchTab('records');
+}
+
+// ============ 記録一覧 ============
+function renderRecords() {
+  const list = document.getElementById('record-list');
+  document.getElementById('record-count').textContent = records.length + '件の記録';
+  if (records.length === 0) {
+    list.innerHTML = '<div class="empty-state">🍚<br>まだ記録がありません</div>';
+    return;
+  }
+  list.innerHTML = records.map(r => {
+    const waterStr = r.waterMl ? r.waterMl + 'ml' : (WATER_LABELS[r.waterPreset] || r.waterPreset);
+    const stars = r.rating > 0 ? '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) : '';
+    const comment = r.comment ? `<div class="rec-comment">${escHtml(r.comment)}</div>` : '';
+    const ratingEl = stars ? `<div class="rec-stars">${stars}</div>` : '';
+    return `
+      <div class="record-card">
+        <div class="record-body">
+          <div class="rec-date">${r.date}</div>
+          <div class="rec-name">${escHtml(r.prefecture)} / ${escHtml(r.variety)}</div>
+          <div class="rec-meta">${r.amount}合 ／ 水: ${waterStr}</div>
+          ${comment}
+          ${ratingEl}
+        </div>
+        <button class="btn-icon btn-red" onclick="deleteRecord(${r.id})">削除</button>
+      </div>`;
+  }).join('');
+}
+
+function deleteRecord(id) {
+  records = records.filter(r => r.id !== id);
+  localStorage.setItem('riceRecords', JSON.stringify(records));
+  renderRecords();
+}
+
+// ============ CSV ============
+function exportCSV() {
+  if (records.length === 0) { alert('記録がありません'); return; }
+  const header = '日付,都道府県,銘柄,合数,水加減,感想,総評';
+  const rows = records.map(r => {
+    const w = r.waterMl ? r.waterMl+'ml' : (WATER_LABELS[r.waterPreset] || r.waterPreset);
+    return [r.date, r.prefecture, r.variety, r.amount+'合', w,
+      '"'+r.comment.replace(/"/g,'""')+'"', '★'.repeat(r.rating)].join(',');
+  });
+  const csv = '\uFEFF' + [header, ...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'rice-record-' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+}
+
+// ============ 銘柄管理モーダル ============
+function openModal() {
+  renderVarietyChips();
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+  renderVarietySelect();
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function renderVarietyChips() {
+  const grid = document.getElementById('variety-chips');
+  grid.innerHTML = getAllVarieties().map(v => {
+    const isCustom = customVarieties.includes(v);
+    const delBtn = isCustom ? `<button class="chip-del" onclick="removeVariety('${escAttr(v)}')">×</button>` : '';
+    return `<span class="variety-chip ${isCustom?'custom':''}">${escHtml(v)}${delBtn}</span>`;
+  }).join('');
+}
+
+function addVariety() {
+  const inp = document.getElementById('inp-new-variety');
+  const val = inp.value.trim();
+  if (!val) return;
+  if (getAllVarieties().includes(val)) { alert('すでに登録されています'); return; }
+  customVarieties.push(val);
+  localStorage.setItem('customVarieties', JSON.stringify(customVarieties));
+  inp.value = '';
+  renderVarietyChips();
+}
+
+function removeVariety(v) {
+  customVarieties = customVarieties.filter(c => c !== v);
+  localStorage.setItem('customVarieties', JSON.stringify(customVarieties));
+  renderVarietyChips();
+}
+
+// ============ タブ切替 ============
+function switchTab(tab) {
+  document.getElementById('page-form').classList.toggle('hidden', tab !== 'form');
+  document.getElementById('page-records').classList.toggle('hidden', tab !== 'records');
+  document.getElementById('tab-form').classList.toggle('active', tab === 'form');
+  document.getElementById('tab-records').classList.toggle('active', tab === 'records');
+  if (tab === 'records') renderRecords();
+}
+
+// ============ ユーティリティ ============
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return String(s).replace(/'/g,"\\'");
+}
+
+init();
+</script>
+</body>
+</html>
